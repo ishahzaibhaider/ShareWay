@@ -1,4 +1,4 @@
-# commute_connect
+# ShareWay
 
 A new Flutter project.
 

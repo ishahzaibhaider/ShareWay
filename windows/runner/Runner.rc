@@ -89,13 +89,13 @@ BEGIN
     BEGIN
         BLOCK "040904e4"
         BEGIN
-            VALUE "CompanyName", "com.commutconnect" "\0"
-            VALUE "FileDescription", "commute_connect" "\0"
+            VALUE "CompanyName", "com.shareway" "\0"
+            VALUE "FileDescription", "ShareWay" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "commute_connect" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2026 com.commutconnect. All rights reserved." "\0"
-            VALUE "OriginalFilename", "commute_connect.exe" "\0"
-            VALUE "ProductName", "commute_connect" "\0"
+            VALUE "InternalName", "share_way" "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2026 com.shareway. All rights reserved." "\0"
+            VALUE "OriginalFilename", "share_way.exe" "\0"
+            VALUE "ProductName", "ShareWay" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

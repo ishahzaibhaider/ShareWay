@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(flutter create --org com.commutconnect --project-name commute_connect .)"
+    ]
+  }
+}

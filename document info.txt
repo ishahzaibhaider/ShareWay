@@ -1,0 +1,197 @@
+FINAL PROJECT PROPOSAL
+
+Title: Development of an AI-Powered Ride-Sharing Mobile Application for Urban Commuters
+
+
+
+
+Program: Bachelor of Artificial intelligence
+Course Title: Terminal project
+Project Track: Mobile Application Development (Cross-Platform)
+Submitted by:
+Aymen Ali Seemab	fa23-bai-011
+Nimra Tahseen Yousaf	fa23-bai-043
+Syed Muhammad Shahzaib Haider	fa23-bai-050
+
+
+Supervisor: Sir Shujaat Hussain
+University : Comsats university Islamabad
+
+
+
+
+Submission Date: 20 feburary 2026
+
+
+
+
+
+
+
+
+Table of Contents
+Abstract
+Introduction
+Problem Statement
+Aim and Objectives
+Scope and Limitations
+Literature Review
+Proposed Methodology
+System Architecture
+Functional and Non-Functional Requirements
+Technology Stack
+System Modules
+Expected Outcomes and Impact
+Project Schedule (Gantt Chart)
+Budget and Resources
+Conclusion
+
+
+
+
+
+
+Abstract
+The rapid urbanization of cities has led to severe traffic congestion, increased carbon emissions, and rising commuting costs due to the prevalence of single-occupancy vehicles. This project proposes the design and development
+of "CommuteConnect," a cross-platform mobile application aimed at revolutionizing daily commuting through intelligent carpooling and ride-sharing. By leveraging the Flutter framework for a unified iOS and Android experience, integrating Google Maps APIs for precise geo-location, and implementing an AI- based matching algorithm, the application will connect commuters with similar routes and schedules. The system will facilitate fare splitting, real-time ride tracking, and in-app communication, ultimately contributing to reduced traffic density, lower fuel expenses, and a diminished environmental footprint. This report outlines the comprehensive plan, methodology, and expected outcomes for the proposed system as a final year project.
+
+Introduction
+In the modern urban landscape, transportation remains a critical challenge. The culture of "one person, one car" is unsustainable, leading to wastage of resources and infrastructure strain. While services like Uber and Careem exist, they are often optimized for on-demand, point-to-point travel and can be cost-prohibitive for regular, scheduled commutes. There is a distinct market gap for a platform specifically dedicated to recurring commuters—students and professionals traveling to the same destination at similar times daily.
+"CommuteConnect" aims to fill this gap by acting as a digital intermediary. It will not only connect drivers with empty seats to passengers needing a ride but will also use artificial intelligence to learn user patterns and suggest optimal matches. This project represents a fusion of modern mobile development frameworks, cloud computing, and geospatial technology to create a socially responsible and economically beneficial application.
+
+Problem Statement
+Urban commuters currently face a multi-faceted problem:
+Economic Inefficiency: Daily fuel and maintenance costs for individual vehicles are high. Parking fees in city centers add to the financial burden.
+Environmental Impact: A high volume of vehicles contributes significantly to urban air pollution and carbon footprint.
+Traffic Congestion: Peak hours see a massive influx of single-occupancy vehicles, leading to lost productive hours and increased stress.
+Lack of Trust and Coordination: Existing informal carpooling methods lack structure, security, and intelligent matching based on dynamic variables like real-time traffic and specific route deviations.
+Therefore, there is a pressing need for a system that provides a secure, automated, and intelligent platform to facilitate ride-sharing among verified commuters.
+
+Aim and Objectives
+Aim:
+To design, develop, and evaluate a cross-platform mobile application that utilizes AI- driven algorithms to connect daily commuters for efficient and cost-effective ride- sharing.
+Objectives:
+Develop a User-Centric Mobile Interface: Create an intuitive and responsive UI/UX using Flutter that works seamlessly on both Android and iOS devices.
+Implement Precise Geo-Location and Routing: Integrate Google Maps APIs for accurate pick-up/drop-off location selection, route calculation, and real-time navigation.
+Design an AI-Based Matching Algorithm: Develop a backend algorithm that optimizes ride matches based on overlapping routes, time schedules, user preferences, and real-time traffic data.
+Integrate a Secure Payment Gateway: Implement a digital wallet system or payment gateway API (e.g., Stripe, PayPal) for automated fare splitting and transaction handling.
+Build a Real-Time Communication System: Incorporate in-app chat and notification services using Firebase Cloud Messaging for seamless coordination between riders and drivers.
+Establish a User Verification System: Create a profile management system with phone/email verification and optional institutional ID uploads to ensure community safety.
+
+Scope and Limitations
+Scope:
+The project will focus on scheduled and recurring rides (e.g., daily office commute) as a primary feature, with an option for one-time rides.
+Development will cover the core user journey: Registration →→ Route Creation →→ Ride Search/Matching →→ Ride Request →→ Fare Splitting →→ Ride Completion.
+The system will include a rating and review mechanism for accountability.
+Limitations:
+Geographical Scope: Initial testing and data will be limited to [Your City/Region].
+Payment Processing: Due to the complexity of financial regulations, the payment gateway may operate in a simulated "sandbox" mode for the initial prototype, or integrate with a simplified digital wallet.
+Real-Time Traffic Data: Relies entirely on the accuracy and availability of third-party APIs (Google Maps).
+Scalability: The initial architecture is designed for a moderate user base; enterprise- level load balancing is beyond the scope of this phase.
+
+Literature Review
+A review of existing literature and applications reveals the potential and challenges in this domain.
+Existing Platforms: Studies on applications like BlaBlaCar (focused on long-distance inter-city travel) and Waze Carpool (integrated with navigation) show a high demand for shared mobility. However, these platforms often lack hyper-local, intra-city AI optimization for daily commutes.
+AI in Transportation: Research by [Author, Year] highlights the effectiveness of machine learning algorithms, such as K-Means clustering and Genetic Algorithms, in solving the "Ride-Matching Problem" (RMP) by grouping users with similar trajectories.
+User Trust and Safety: Literature emphasizes that the success of peer-to-peer sharing economies relies heavily on trust. Features like verified profiles, ratings, and in-app communication logs are critical success factors, as noted in studies of collaborative consumption.
+Cross-Platform Development: Comparative analyses (e.g., [Author, Year]) demonstrate that Flutter offers near-native performance and a single codebase advantage, making it ideal for startups and academic projects aiming for a wide reach with limited resources.
+
+Proposed Methodology
+To ensure a structured and iterative development process, the project will adopt the Agile (Scrum) methodology. This approach allows for flexibility, continuous feedback, and incremental delivery of features.
+Requirement Gathering: Conduct surveys and interviews with potential users (students, office workers) to finalize core features.
+Design Phase: Create wireframes, UI mockups (using Figma), and database schema design.
+Development Sprints:
+Sprint 1: User Authentication and Profile Management.
+Sprint 2: Google Maps Integration and Route Creation.
+Sprint 3: AI Matching Algorithm and Backend Logic.
+Sprint 4: Ride Request, Tracking, and In-App Chat.
+Sprint 5: Payment Gateway Integration and Rating System.
+Testing: Conduct unit testing, integration testing, and User Acceptance Testing (UAT) with a small focus group.
+Deployment: Prepare the app for deployment on Google Play Store and Apple App Store test tracks.
+
+System Architecture
+The application will follow a Client-Server Architecture with cloud-based services.
+Client Layer: Flutter-based mobile application (iOS & Android). Handles UI rendering and user input.
+Application/Logic Layer: Firebase Cloud Functions. This serverless backend will host the core business logic, including the AI matching algorithm and request handling.
+Data Layer: Firebase Services.
+Firestore: NoSQL database to store user profiles, ride details, routes, and transactions.
+Firebase Authentication: Secure user sign-up/login.
+Firebase Storage: Store profile pictures and verification documents.
+Third-Party APIs:
+Google Maps SDK: For maps, places autocomplete, and distance matrix calculations.
+Payment Gateway API (e.g., Stripe): For processing payments.
+
+Functional and Non-Functional Requirements
+Functional Requirements:
+Users shall be able to register and log in using email or phone number.
+Users shall be able to create a ride offer (as a driver) specifying origin, destination, time, and available seats.
+Users shall be able to search for available rides by entering pick-up and drop-off locations.
+The system shall display a list of matching rides sorted by relevance.
+Users shall be able to send ride requests to drivers.
+Drivers shall be able to accept or reject ride requests.
+The system shall calculate and suggest a fair fare split based on distance.
+Users shall be able to chat with their matched ride partner in real-time.
+Upon ride completion, users shall be able to rate each other.
+Non-Functional Requirements:
+Usability: The application interface must be intuitive, requiring minimal training.
+Performance: Ride search results must load within 3 seconds under normal network conditions.
+Security: All user data and transactions must be encrypted (SSL/TLS). Passwords must be hashed.
+Reliability: The app must handle concurrent users without crashing.
+Compatibility: The app must be compatible with Android (API 21+) and iOS (13+).
+
+
+
+Component
+Technology/Tool
+Justification
+Frontend
+Flutter (Dart)
+Single codebase for iOS & Android, hot-reload for faster development, expressive UI.
+IDE
+Visual Studio Code
+Lightweight, excellent Flutter plugins, integrated terminal and Git control.
+Backend & Database
+Firebase (Auth, Firestore, Functions, Storage, Messaging)
+Real-time sync, serverless architecture, seamless integration with mobile apps.
+Maps & Location
+Google Maps SDK (Flutter plugin) / Geolocator package
+Industry standard for accurate mapping, routing, and place search.
+AI/Algorithm
+Dart / Python (via Cloud Functions)
+Core logic for matching will be implemented here, potentially using GeoHashing.
+Payment
+Stripe / PayPal SDK
+Secure, well-documented, supports multiple currencies.
+
+
+
+
+Version Control
+Git (GitHub / GitLab)
+Code collaboration, version management, and backup.
+
+
+Technology Stack
+
+System Modules
+User Module: Handles registration, login, profile management, and vehicle details (for drivers).
+Ride Management Module: Allows users to publish ride offers and search for available rides.
+Matching Engine Module: Core AI logic that compares route geometries (polylines) and schedules to find the best matches.
+Transaction Module: Manages ride requests, accept/reject logic, and the status of the ride (Pending, Ongoing, Completed).
+Communication Module: Facilitates in-app chat and push notifications for ride updates.
+Payment Module: Handles fare calculation, digital wallet balance, and secure transfer of funds.
+Rating & Review Module: Allows users to provide feedback post-ride.
+
+Expected Outcomes and Impact
+Tangible Outcomes:
+A fully functional cross-platform mobile application (APK and IPA files).
+Complete source code with documentation hosted on GitHub.
+A comprehensive project report detailing the design, development, and testing phases.
+A user manual for the application.
+Real-World Impact:
+Economic: Reduction in individual commuting costs by up to 50% through fare splitting.
+Environmental: Potential reduction in the number of vehicles on the road, leading to lower carbon emissions.
+Social: Fostering a community of trust and collaboration among commuters, potentially reducing social isolation during travel.
+
+15. Conclusion
+The proposed "CommuteConnect" application presents a viable and innovative solution to the persistent problems of urban commuting. By combining the power of cross-platform development (Flutter), robust cloud services (Firebase), and intelligent matching algorithms, this project aims to deliver a high-quality, impactful product. It not only fulfills the academic requirements of a final year project by demonstrating technical proficiency in mobile development but also addresses a real-world societal need. The successful completion of this project will result in a portfolio-ready application with significant potential for real-world deployment and further enhancement.

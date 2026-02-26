@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../providers/rides_provider.dart';
-import '../../providers/location_provider.dart';
 import '../../services/maps/google_maps_service.dart';
 import '../../widgets/ride/ride_card.dart';
 import '../../widgets/common/loading_indicator.dart';

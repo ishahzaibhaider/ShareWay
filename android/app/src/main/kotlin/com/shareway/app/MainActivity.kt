@@ -1,4 +1,4 @@
-package com.commutconnect.commute_connect
+package com.shareway.app
 
 import io.flutter.embedding.android.FlutterActivity
 

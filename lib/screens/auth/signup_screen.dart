@@ -84,7 +84,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Join CommuteConnect and start sharing rides',
+                  'Join ShareWay and start sharing rides',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                         color: AppTheme.textSecondary,
                       ),

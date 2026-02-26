@@ -1,6 +1,6 @@
 {
-    "name": "commute_connect",
-    "short_name": "commute_connect",
+    "name": "ShareWay",
+    "short_name": "ShareWay",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

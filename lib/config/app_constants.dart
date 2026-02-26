@@ -1,5 +1,5 @@
 class AppConstants {
-  static const String appName = 'CommuteConnect';
+  static const String appName = 'ShareWay';
   static const String appVersion = '1.0.0';
 
   // Matching Algorithm Weights

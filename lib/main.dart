@@ -11,30 +11,34 @@ Future<void> main() async {
   // Load environment variables
   await dotenv.load(fileName: '.env');
 
-  // Initialize Firebase
-  await Firebase.initializeApp(
-    options: FirebaseOptions(
-      apiKey: dotenv.env['FIREBASE_API_KEY'] ?? '',
-      appId: dotenv.env['FIREBASE_APP_ID'] ?? '',
-      messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
-      projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? '',
-      authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN'],
-      storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'],
-    ),
-  );
+  // Initialize Firebase (gracefully handle missing credentials)
+  try {
+    await Firebase.initializeApp(
+      options: FirebaseOptions(
+        apiKey: dotenv.env['FIREBASE_API_KEY'] ?? '',
+        appId: dotenv.env['FIREBASE_APP_ID'] ?? '',
+        messagingSenderId: dotenv.env['FIREBASE_MESSAGING_SENDER_ID'] ?? '',
+        projectId: dotenv.env['FIREBASE_PROJECT_ID'] ?? '',
+        authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN'],
+        storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'],
+      ),
+    );
+  } catch (e) {
+    debugPrint('Firebase init failed: $e — running without Firebase');
+  }
 
-  runApp(const ProviderScope(child: CommuteConnectApp()));
+  runApp(const ProviderScope(child: ShareWayApp()));
 }
 
-class CommuteConnectApp extends ConsumerWidget {
-  const CommuteConnectApp({super.key});
+class ShareWayApp extends ConsumerWidget {
+  const ShareWayApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final router = ref.watch(routerProvider);
 
     return MaterialApp.router(
-      title: 'CommuteConnect',
+      title: 'ShareWay',
       theme: AppTheme.lightTheme,
       routerConfig: router,
       debugShowCheckedModeBanner: false,

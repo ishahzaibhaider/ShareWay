@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../models/ride_model.dart';
@@ -85,37 +86,44 @@ class _RideDetailsScreenState extends ConsumerState<RideDetailsScreen> {
 
           final isDriver = currentUser?.uid == ride.driverId;
 
+          // Calculate center and bounds for the map
+          final centerLat = (ride.origin.lat + ride.destination.lat) / 2;
+          final centerLng = (ride.origin.lng + ride.destination.lng) / 2;
+
           return SingleChildScrollView(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Map Preview
+                // Map Preview with FlutterMap
                 SizedBox(
                   height: 200,
-                  child: GoogleMap(
-                    initialCameraPosition: CameraPosition(
-                      target: LatLng(ride.origin.lat, ride.origin.lng),
-                      zoom: 12,
+                  child: FlutterMap(
+                    options: MapOptions(
+                      initialCenter: LatLng(centerLat, centerLng),
+                      initialZoom: 12,
                     ),
-                    markers: {
-                      Marker(
-                        markerId: const MarkerId('origin'),
-                        position: LatLng(ride.origin.lat, ride.origin.lng),
-                        infoWindow:
-                            InfoWindow(title: 'Pickup', snippet: ride.origin.address),
+                    children: [
+                      TileLayer(
+                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.shareway.app',
                       ),
-                      Marker(
-                        markerId: const MarkerId('destination'),
-                        position: LatLng(
-                            ride.destination.lat, ride.destination.lng),
-                        infoWindow: InfoWindow(
-                            title: 'Dropoff', snippet: ride.destination.address),
-                        icon: BitmapDescriptor.defaultMarkerWithHue(
-                            BitmapDescriptor.hueRed),
+                      MarkerLayer(
+                        markers: [
+                          Marker(
+                            point: LatLng(ride.origin.lat, ride.origin.lng),
+                            width: 40,
+                            height: 40,
+                            child: const Icon(Icons.circle, color: Colors.green, size: 24),
+                          ),
+                          Marker(
+                            point: LatLng(ride.destination.lat, ride.destination.lng),
+                            width: 40,
+                            height: 40,
+                            child: const Icon(Icons.location_on, color: Colors.red, size: 30),
+                          ),
+                        ],
                       ),
-                    },
-                    zoomControlsEnabled: false,
-                    myLocationButtonEnabled: false,
+                    ],
                   ),
                 ),
 

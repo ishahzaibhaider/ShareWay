@@ -24,7 +24,48 @@ class ProfileScreen extends ConsumerWidget {
       ),
       body: userAsync.when(
         loading: () => const LoadingIndicator(),
-        error: (e, _) => Center(child: Text('Error: $e')),
+        error: (e, _) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.cloud_off, size: 64, color: Colors.grey.shade400),
+                const SizedBox(height: 16),
+                const Text(
+                  'Unable to load profile',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Please check your internet connection and try again.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: AppTheme.textSecondary),
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton.icon(
+                  onPressed: () {
+                    ref.invalidate(currentUserProvider);
+                  },
+                  icon: const Icon(Icons.refresh),
+                  label: const Text('Retry'),
+                ),
+                const SizedBox(height: 16),
+                OutlinedButton.icon(
+                  onPressed: () async {
+                    await ref.read(currentUserProvider.notifier).signOut();
+                  },
+                  icon: const Icon(Icons.logout, color: Colors.red),
+                  label: const Text('Logout',
+                      style: TextStyle(color: Colors.red)),
+                  style: OutlinedButton.styleFrom(
+                    side: const BorderSide(color: Colors.red),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
         data: (user) {
           if (user == null) {
             return const Center(child: Text('Not logged in'));

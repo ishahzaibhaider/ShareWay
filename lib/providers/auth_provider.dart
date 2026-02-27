@@ -41,7 +41,17 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
     try {
       state = const AsyncValue.loading();
       final authService = _ref.read(firebaseAuthServiceProvider);
-      final user = await authService.getUserProfile(uid);
+      // Retry with exponential backoff for transient Firestore errors
+      UserModel? user;
+      for (int attempt = 0; attempt < 3; attempt++) {
+        try {
+          user = await authService.getUserProfile(uid);
+          break;
+        } catch (e) {
+          if (attempt == 2) rethrow;
+          await Future.delayed(Duration(milliseconds: 500 * (attempt + 1)));
+        }
+      }
       state = AsyncValue.data(user);
     } catch (e, s) {
       state = AsyncValue.error(e, s);

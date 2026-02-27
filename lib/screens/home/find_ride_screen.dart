@@ -3,11 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/theme.dart';
 import '../../providers/rides_provider.dart';
-import '../../services/maps/google_maps_service.dart';
+import '../../services/maps/osm_service.dart';
 import '../../widgets/ride/ride_card.dart';
 import '../../widgets/common/loading_indicator.dart';
 
-final googleMapsServiceProvider = Provider((ref) => GoogleMapsService());
+final osmServiceProvider = Provider((ref) => OsmService());
 
 class FindRideScreen extends ConsumerStatefulWidget {
   const FindRideScreen({super.key});
@@ -53,7 +53,7 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
   }
 
   Future<void> _showPlacePicker(bool isPickup) async {
-    final mapsService = ref.read(googleMapsServiceProvider);
+    final osmService = ref.read(osmServiceProvider);
     final controller = isPickup ? _pickupController : _dropoffController;
 
     final result = await showModalBottomSheet<PlaceDetails>(
@@ -62,7 +62,7 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => _PlaceSearchSheet(mapsService: mapsService),
+      builder: (context) => PlaceSearchSheet(osmService: osmService),
     );
 
     if (result != null) {
@@ -260,31 +260,31 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
   }
 }
 
-// Place search bottom sheet
-class _PlaceSearchSheet extends StatefulWidget {
-  final GoogleMapsService mapsService;
+// Place search bottom sheet using Nominatim (OSM)
+class PlaceSearchSheet extends StatefulWidget {
+  final OsmService osmService;
 
-  const _PlaceSearchSheet({required this.mapsService});
+  const PlaceSearchSheet({super.key, required this.osmService});
 
   @override
-  State<_PlaceSearchSheet> createState() => _PlaceSearchSheetState();
+  State<PlaceSearchSheet> createState() => _PlaceSearchSheetState();
 }
 
-class _PlaceSearchSheetState extends State<_PlaceSearchSheet> {
+class _PlaceSearchSheetState extends State<PlaceSearchSheet> {
   final _searchController = TextEditingController();
-  List<PlacePrediction> _predictions = [];
+  List<PlaceSearchResult> _results = [];
   bool _isLoading = false;
 
   Future<void> _search(String query) async {
     if (query.length < 3) {
-      setState(() => _predictions = []);
+      setState(() => _results = []);
       return;
     }
 
     setState(() => _isLoading = true);
-    final results = await widget.mapsService.getPlacePredictions(query);
+    final results = await widget.osmService.searchPlaces(query);
     setState(() {
-      _predictions = results;
+      _results = results;
       _isLoading = false;
     });
   }
@@ -324,23 +324,19 @@ class _PlaceSearchSheetState extends State<_PlaceSearchSheet> {
             Expanded(
               child: ListView.builder(
                 controller: scrollController,
-                itemCount: _predictions.length,
+                itemCount: _results.length,
                 itemBuilder: (context, index) {
-                  final prediction = _predictions[index];
+                  final result = _results[index];
                   return ListTile(
                     leading: const Icon(Icons.location_on_outlined),
-                    title: Text(prediction.mainText),
+                    title: Text(result.mainText),
                     subtitle: Text(
-                      prediction.secondaryText,
+                      result.secondaryText,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    onTap: () async {
-                      final details = await widget.mapsService
-                          .getPlaceDetails(prediction.placeId);
-                      if (details != null && context.mounted) {
-                        Navigator.of(context).pop(details);
-                      }
+                    onTap: () {
+                      Navigator.of(context).pop(result.toPlaceDetails());
                     },
                   );
                 },

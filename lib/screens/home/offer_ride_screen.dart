@@ -6,7 +6,7 @@ import '../../config/app_constants.dart';
 import '../../models/ride_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/rides_provider.dart';
-import '../../services/maps/google_maps_service.dart';
+import '../../services/maps/osm_service.dart';
 import '../../widgets/common/custom_button.dart';
 import '../home/find_ride_screen.dart';
 
@@ -42,7 +42,7 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
   }
 
   Future<void> _showPlacePicker(bool isOrigin) async {
-    final mapsService = ref.read(googleMapsServiceProvider);
+    final osmService = ref.read(osmServiceProvider);
     final controller = isOrigin ? _originController : _destinationController;
 
     final result = await showModalBottomSheet<PlaceDetails>(
@@ -51,7 +51,7 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => _PlaceSearchSheet(mapsService: mapsService),
+      builder: (context) => PlaceSearchSheet(osmService: osmService),
     );
 
     if (result != null) {
@@ -98,10 +98,10 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
     setState(() => _isLoading = true);
 
     try {
-      final mapsService = ref.read(googleMapsServiceProvider);
+      final osmService = ref.read(osmServiceProvider);
 
-      // Get directions for route info
-      final directions = await mapsService.getDirections(
+      // Get directions for route info via OSRM
+      final directions = await osmService.getDirections(
         originLat: _originPlace!.lat,
         originLng: _originPlace!.lng,
         destLat: _destinationPlace!.lat,
@@ -142,7 +142,7 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
         departureTime: departureDateTime,
         availableSeats: _availableSeats,
         totalSeats: _availableSeats,
-        routePolyline: directions?.polyline,
+        routePolyline: null,
         estimatedDistance: distanceKm,
         estimatedFare: fare,
         rideType: _rideType,
@@ -365,93 +365,6 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
           ],
         ),
       ),
-    );
-  }
-}
-
-// Reuse the PlaceSearchSheet from find_ride_screen
-class _PlaceSearchSheet extends StatefulWidget {
-  final GoogleMapsService mapsService;
-  const _PlaceSearchSheet({required this.mapsService});
-
-  @override
-  State<_PlaceSearchSheet> createState() => _PlaceSearchSheetState();
-}
-
-class _PlaceSearchSheetState extends State<_PlaceSearchSheet> {
-  final _searchController = TextEditingController();
-  List<PlacePrediction> _predictions = [];
-  bool _isLoading = false;
-
-  Future<void> _search(String query) async {
-    if (query.length < 3) {
-      setState(() => _predictions = []);
-      return;
-    }
-    setState(() => _isLoading = true);
-    final results = await widget.mapsService.getPlacePredictions(query);
-    setState(() {
-      _predictions = results;
-      _isLoading = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      maxChildSize: 0.9,
-      minChildSize: 0.5,
-      expand: false,
-      builder: (context, scrollController) {
-        return Column(
-          children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 40, height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _searchController,
-                autofocus: true,
-                onChanged: _search,
-                decoration: const InputDecoration(
-                  hintText: 'Search for a place...',
-                  prefixIcon: Icon(Icons.search),
-                ),
-              ),
-            ),
-            if (_isLoading) const LinearProgressIndicator(),
-            Expanded(
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: _predictions.length,
-                itemBuilder: (context, index) {
-                  final prediction = _predictions[index];
-                  return ListTile(
-                    leading: const Icon(Icons.location_on_outlined),
-                    title: Text(prediction.mainText),
-                    subtitle: Text(prediction.secondaryText,
-                        maxLines: 1, overflow: TextOverflow.ellipsis),
-                    onTap: () async {
-                      final details = await widget.mapsService
-                          .getPlaceDetails(prediction.placeId);
-                      if (details != null && context.mounted) {
-                        Navigator.of(context).pop(details);
-                      }
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

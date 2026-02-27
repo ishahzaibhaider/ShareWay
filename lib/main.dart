@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'config/theme.dart';
 import 'routes/app_router.dart';
@@ -22,6 +23,12 @@ Future<void> main() async {
         authDomain: dotenv.env['FIREBASE_AUTH_DOMAIN'],
         storageBucket: dotenv.env['FIREBASE_STORAGE_BUCKET'],
       ),
+    );
+
+    // Enable Firestore offline persistence for resilience against transient errors
+    FirebaseFirestore.instance.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
   } catch (e) {
     debugPrint('Firebase init failed: $e — running without Firebase');

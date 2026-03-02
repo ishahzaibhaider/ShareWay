@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../config/theme.dart';
 import '../../models/ride_model.dart';
+import '../common/glass_container.dart';
 
 class RideCard extends StatelessWidget {
   final RideModel ride;
@@ -17,11 +18,12 @@ class RideCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
+    return GlassContainer(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-      child: InkWell(
+      padding: EdgeInsets.zero,
+      child: GestureDetector(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(12),
+        behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -32,7 +34,7 @@ class RideCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 20,
-                    backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
+                    backgroundColor: AppTheme.primaryColor.withOpacity(0.2),
                     child: Text(
                       ride.driverName.isNotEmpty
                           ? ride.driverName[0].toUpperCase()
@@ -50,7 +52,8 @@ class RideCard extends StatelessWidget {
                       children: [
                         Text(
                           ride.driverName,
-                          style: const TextStyle(
+                          style: TextStyle(
+                            color: AppTheme.textPrimary,
                             fontWeight: FontWeight.w600,
                             fontSize: 15,
                           ),
@@ -92,7 +95,7 @@ class RideCard extends StatelessWidget {
                     ),
                 ],
               ),
-              const Divider(height: 24),
+              Divider(height: 24, color: AppTheme.dividerColor),
 
               // Route info
               _buildLocationRow(
@@ -140,7 +143,15 @@ class RideCard extends StatelessWidget {
                   spacing: 6,
                   children: ride.paymentMethods.map((method) {
                     return Chip(
-                      label: Text(method, style: const TextStyle(fontSize: 11)),
+                      label: Text(
+                        method,
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: AppTheme.textSecondary,
+                        ),
+                      ),
+                      backgroundColor: Colors.white.withOpacity(0.08),
+                      side: BorderSide(color: AppTheme.dividerColor),
                       padding: EdgeInsets.zero,
                       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                       visualDensity: VisualDensity.compact,
@@ -163,7 +174,7 @@ class RideCard extends StatelessWidget {
         Expanded(
           child: Text(
             text,
-            style: const TextStyle(fontSize: 14),
+            style: TextStyle(fontSize: 14, color: AppTheme.textPrimary),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

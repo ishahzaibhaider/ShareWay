@@ -16,6 +16,7 @@ final currentUserProvider =
 
 class CurrentUserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   final Ref _ref;
+  bool _isManualAuth = false;
 
   CurrentUserNotifier(this._ref) : super(const AsyncValue.loading()) {
     _init();
@@ -23,25 +24,24 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
 
   void _init() {
     _ref.listen(authStateProvider, (previous, next) {
-      next.when(
-        data: (user) async {
-          if (user == null) {
-            state = const AsyncValue.data(null);
-          } else {
-            await loadUser(user.uid);
-          }
-        },
-        loading: () => state = const AsyncValue.loading(),
-        error: (e, s) => state = AsyncValue.error(e, s),
-      );
+      final user = next.valueOrNull;
+      if (_isManualAuth) {
+        // Skip — signIn/signUp already set the state
+        _isManualAuth = false;
+        return;
+      }
+      if (user == null) {
+        state = const AsyncValue.data(null);
+      } else {
+        _loadUser(user.uid);
+      }
     });
   }
 
-  Future<void> loadUser(String uid) async {
+  Future<void> _loadUser(String uid) async {
     try {
       state = const AsyncValue.loading();
       final authService = _ref.read(firebaseAuthServiceProvider);
-      // Retry with exponential backoff for transient Firestore errors
       UserModel? user;
       for (int attempt = 0; attempt < 3; attempt++) {
         try {
@@ -52,9 +52,9 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
           await Future.delayed(Duration(milliseconds: 500 * (attempt + 1)));
         }
       }
-      state = AsyncValue.data(user);
+      if (mounted) state = AsyncValue.data(user);
     } catch (e, s) {
-      state = AsyncValue.error(e, s);
+      if (mounted) state = AsyncValue.error(e, s);
     }
   }
 
@@ -66,6 +66,7 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   }) async {
     state = const AsyncValue.loading();
     try {
+      _isManualAuth = true;
       final authService = _ref.read(firebaseAuthServiceProvider);
       final user = await authService.signUpWithEmail(
         email: email,
@@ -75,6 +76,7 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
       );
       state = AsyncValue.data(user);
     } catch (e, s) {
+      _isManualAuth = false;
       state = AsyncValue.error(e, s);
     }
   }
@@ -85,6 +87,7 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
   }) async {
     state = const AsyncValue.loading();
     try {
+      _isManualAuth = true;
       final authService = _ref.read(firebaseAuthServiceProvider);
       final user = await authService.signInWithEmail(
         email: email,
@@ -92,6 +95,7 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
       );
       state = AsyncValue.data(user);
     } catch (e, s) {
+      _isManualAuth = false;
       state = AsyncValue.error(e, s);
     }
   }
@@ -106,5 +110,12 @@ class CurrentUserNotifier extends StateNotifier<AsyncValue<UserModel?>> {
     final authService = _ref.read(firebaseAuthServiceProvider);
     await authService.updateUserProfile(user);
     state = AsyncValue.data(user);
+  }
+
+  Future<void> reload() async {
+    final firebaseUser = _ref.read(authStateProvider).valueOrNull;
+    if (firebaseUser != null) {
+      await _loadUser(firebaseUser.uid);
+    }
   }
 }

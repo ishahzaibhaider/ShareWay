@@ -20,16 +20,21 @@ class FirestoreService {
     return doc.id;
   }
 
-  // Get active rides stream
+  // Get active rides stream (simplified query to avoid composite index requirement)
   Stream<List<RideModel>> getActiveRides() {
     return _db
         .collection(AppConstants.ridesCollection)
         .where('status', isEqualTo: 'active')
-        .where('departureTime', isGreaterThan: Timestamp.now())
-        .orderBy('departureTime')
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => RideModel.fromFirestore(doc)).toList());
+        .map((snapshot) {
+      final now = DateTime.now();
+      final rides = snapshot.docs
+          .map((doc) => RideModel.fromFirestore(doc))
+          .where((ride) => ride.departureTime.isAfter(now))
+          .toList();
+      rides.sort((a, b) => a.departureTime.compareTo(b.departureTime));
+      return rides;
+    });
   }
 
   // Get rides by driver
@@ -37,10 +42,29 @@ class FirestoreService {
     return _db
         .collection(AppConstants.ridesCollection)
         .where('driverId', isEqualTo: driverId)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => RideModel.fromFirestore(doc)).toList());
+        .map((snapshot) {
+      final rides = snapshot.docs
+          .map((doc) => RideModel.fromFirestore(doc))
+          .toList();
+      rides.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return rides;
+    });
+  }
+
+  // Get rides where user is a passenger
+  Stream<List<RideModel>> getPassengerRides(String passengerId) {
+    return _db
+        .collection(AppConstants.ridesCollection)
+        .snapshots()
+        .map((snapshot) {
+      final rides = snapshot.docs
+          .map((doc) => RideModel.fromFirestore(doc))
+          .where((ride) => ride.passengers.any((p) => p.passengerId == passengerId))
+          .toList();
+      rides.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return rides;
+    });
   }
 
   // Get single ride
@@ -73,25 +97,40 @@ class FirestoreService {
 
   // ============ RIDE REQUESTS ============
 
-  // Create ride request
+  // Create ride request (with duplicate check)
   Future<String> createRideRequest(RideRequestModel request) async {
+    // Check for existing pending request from same passenger for same ride
+    final existing = await _db
+        .collection(AppConstants.rideRequestsCollection)
+        .where('passengerId', isEqualTo: request.passengerId)
+        .where('rideId', isEqualTo: request.rideId)
+        .where('status', isEqualTo: 'pending')
+        .get();
+
+    if (existing.docs.isNotEmpty) {
+      throw Exception('You already have a pending request for this ride');
+    }
+
     final doc = await _db
         .collection(AppConstants.rideRequestsCollection)
         .add(request.toMap());
     return doc.id;
   }
 
-  // Get incoming requests for a driver's ride
+  // Get incoming requests for a driver (simplified: single where + client filter)
   Stream<List<RideRequestModel>> getIncomingRequests(String driverId) {
     return _db
         .collection(AppConstants.rideRequestsCollection)
         .where('driverId', isEqualTo: driverId)
-        .where('status', isEqualTo: 'pending')
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => RideRequestModel.fromFirestore(doc))
-            .toList());
+        .map((snapshot) {
+      final requests = snapshot.docs
+          .map((doc) => RideRequestModel.fromFirestore(doc))
+          .where((r) => r.status == 'pending')
+          .toList();
+      requests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return requests;
+    });
   }
 
   // Get sent requests by passenger
@@ -99,11 +138,14 @@ class FirestoreService {
     return _db
         .collection(AppConstants.rideRequestsCollection)
         .where('passengerId', isEqualTo: passengerId)
-        .orderBy('createdAt', descending: true)
         .snapshots()
-        .map((snapshot) => snapshot.docs
-            .map((doc) => RideRequestModel.fromFirestore(doc))
-            .toList());
+        .map((snapshot) {
+      final requests = snapshot.docs
+          .map((doc) => RideRequestModel.fromFirestore(doc))
+          .toList();
+      requests.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+      return requests;
+    });
   }
 
   // Update ride request status
@@ -129,6 +171,10 @@ class FirestoreService {
 
       final rideDoc = await transaction.get(rideRef);
       final ride = RideModel.fromFirestore(rideDoc);
+
+      if (ride.status != 'active') {
+        throw Exception('This ride is no longer active');
+      }
 
       if (ride.availableSeats <= 0) {
         throw Exception('No seats available');
@@ -186,11 +232,13 @@ class FirestoreService {
       }
     }
 
-    // Create new chat room
+    // Create new chat room with a non-null lastMessageTime so it shows in queries
     final chatRoom = ChatRoom(
       id: '',
       participants: [userId1, userId2],
       rideId: rideId,
+      lastMessageTime: DateTime.now(),
+      lastMessage: '',
     );
 
     final doc = await _db
@@ -199,15 +247,23 @@ class FirestoreService {
     return doc.id;
   }
 
-  // Get chat rooms for user
+  // Get chat rooms for user (simplified: single where + client sort)
   Stream<List<ChatRoom>> getChatRooms(String userId) {
     return _db
         .collection(AppConstants.messagesCollection)
         .where('participants', arrayContains: userId)
-        .orderBy('lastMessageTime', descending: true)
         .snapshots()
-        .map((snapshot) =>
-            snapshot.docs.map((doc) => ChatRoom.fromFirestore(doc)).toList());
+        .map((snapshot) {
+      final rooms = snapshot.docs
+          .map((doc) => ChatRoom.fromFirestore(doc))
+          .toList();
+      rooms.sort((a, b) {
+        final aTime = a.lastMessageTime ?? DateTime(2000);
+        final bTime = b.lastMessageTime ?? DateTime(2000);
+        return bTime.compareTo(aTime);
+      });
+      return rooms;
+    });
   }
 
   // Send message
@@ -266,13 +322,13 @@ class FirestoreService {
       final userData = userDoc.data() as Map<String, dynamic>;
 
       final currentRating = (userData['averageRating'] ?? 0.0).toDouble();
-      final totalRides = (userData['totalRides'] ?? 0) as int;
+      final totalRatings = (userData['totalRatings'] ?? userData['totalRides'] ?? 0) as int;
       final newAverage =
-          ((currentRating * totalRides) + rating.rating) / (totalRides + 1);
+          ((currentRating * totalRatings) + rating.rating) / (totalRatings + 1);
 
       transaction.update(userRef, {
         'averageRating': newAverage,
-        'totalRides': totalRides + 1,
+        'totalRatings': totalRatings + 1,
       });
     });
   }
@@ -282,11 +338,12 @@ class FirestoreService {
     final snapshot = await _db
         .collection(AppConstants.ratingsCollection)
         .where('toUserId', isEqualTo: userId)
-        .orderBy('createdAt', descending: true)
         .get();
-    return snapshot.docs
+    final ratings = snapshot.docs
         .map((doc) => RatingModel.fromFirestore(doc))
         .toList();
+    ratings.sort((a, b) => b.createdAt.compareTo(a.createdAt));
+    return ratings;
   }
 
   // ============ TRANSACTIONS ============

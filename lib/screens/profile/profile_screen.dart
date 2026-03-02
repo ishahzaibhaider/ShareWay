@@ -30,7 +30,7 @@ class ProfileScreen extends ConsumerWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.cloud_off, size: 64, color: Colors.grey.shade400),
+                Icon(Icons.cloud_off, size: 64, color: Colors.white.withOpacity(0.3)),
                 const SizedBox(height: 16),
                 const Text(
                   'Unable to load profile',
@@ -45,7 +45,7 @@ class ProfileScreen extends ConsumerWidget {
                 const SizedBox(height: 24),
                 ElevatedButton.icon(
                   onPressed: () {
-                    ref.invalidate(currentUserProvider);
+                    ref.read(currentUserProvider.notifier).reload();
                   },
                   icon: const Icon(Icons.refresh),
                   label: const Text('Retry'),

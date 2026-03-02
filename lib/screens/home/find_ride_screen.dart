@@ -6,6 +6,7 @@ import '../../providers/rides_provider.dart';
 import '../../services/maps/osm_service.dart';
 import '../../widgets/ride/ride_card.dart';
 import '../../widgets/common/loading_indicator.dart';
+import '../../widgets/common/map_location_picker.dart';
 
 final osmServiceProvider = Provider((ref) => OsmService());
 
@@ -52,26 +53,26 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
         );
   }
 
-  Future<void> _showPlacePicker(bool isPickup) async {
+  Future<void> _showLocationPicker(bool isPickup) async {
     final osmService = ref.read(osmServiceProvider);
-    final controller = isPickup ? _pickupController : _dropoffController;
 
-    final result = await showModalBottomSheet<PlaceDetails>(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    final result = await Navigator.of(context).push<PlaceDetails>(
+      MaterialPageRoute(
+        builder: (context) => MapLocationPicker(
+          osmService: osmService,
+          title: isPickup ? 'Select Pickup Location' : 'Select Dropoff Location',
+        ),
       ),
-      builder: (context) => PlaceSearchSheet(osmService: osmService),
     );
 
     if (result != null) {
       setState(() {
-        controller.text = result.address;
         if (isPickup) {
           _pickupPlace = result;
+          _pickupController.text = result.address.split(',').take(2).join(', ');
         } else {
           _dropoffPlace = result;
+          _dropoffController.text = result.address.split(',').take(2).join(', ');
         }
       });
     }
@@ -109,14 +110,10 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
+              color: Colors.white.withOpacity(0.1),
+              border: Border(
+                bottom: BorderSide(color: Colors.white.withOpacity(0.2)),
+              ),
             ),
             child: Column(
               children: [
@@ -124,7 +121,7 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
                 TextField(
                   controller: _pickupController,
                   readOnly: true,
-                  onTap: () => _showPlacePicker(true),
+                  onTap: () => _showLocationPicker(true),
                   decoration: InputDecoration(
                     hintText: 'Pickup location',
                     prefixIcon: Icon(Icons.circle_outlined,
@@ -139,7 +136,7 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
                               });
                             },
                           )
-                        : null,
+                        : const Icon(Icons.map_outlined, size: 18),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -148,7 +145,7 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
                 TextField(
                   controller: _dropoffController,
                   readOnly: true,
-                  onTap: () => _showPlacePicker(false),
+                  onTap: () => _showLocationPicker(false),
                   decoration: InputDecoration(
                     hintText: 'Dropoff location',
                     prefixIcon: Icon(Icons.location_on,
@@ -163,7 +160,7 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
                               });
                             },
                           )
-                        : null,
+                        : const Icon(Icons.map_outlined, size: 18),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -203,7 +200,7 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.search,
-                            size: 64, color: Colors.grey.shade300),
+                            size: 64, color: Colors.white.withOpacity(0.3)),
                         const SizedBox(height: 16),
                         Text(
                           'Search for available rides',
@@ -223,7 +220,7 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.no_transfer,
-                                  size: 64, color: Colors.grey.shade300),
+                                  size: 64, color: Colors.white.withOpacity(0.3)),
                               const SizedBox(height: 16),
                               const Text('No matching rides found'),
                               const SizedBox(height: 8),
@@ -256,95 +253,6 @@ class _FindRideScreenState extends ConsumerState<FindRideScreen> {
           ),
         ],
       ),
-    );
-  }
-}
-
-// Place search bottom sheet using Nominatim (OSM)
-class PlaceSearchSheet extends StatefulWidget {
-  final OsmService osmService;
-
-  const PlaceSearchSheet({super.key, required this.osmService});
-
-  @override
-  State<PlaceSearchSheet> createState() => _PlaceSearchSheetState();
-}
-
-class _PlaceSearchSheetState extends State<PlaceSearchSheet> {
-  final _searchController = TextEditingController();
-  List<PlaceSearchResult> _results = [];
-  bool _isLoading = false;
-
-  Future<void> _search(String query) async {
-    if (query.length < 3) {
-      setState(() => _results = []);
-      return;
-    }
-
-    setState(() => _isLoading = true);
-    final results = await widget.osmService.searchPlaces(query);
-    setState(() {
-      _results = results;
-      _isLoading = false;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return DraggableScrollableSheet(
-      initialChildSize: 0.7,
-      maxChildSize: 0.9,
-      minChildSize: 0.5,
-      expand: false,
-      builder: (context, scrollController) {
-        return Column(
-          children: [
-            const SizedBox(height: 8),
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _searchController,
-                autofocus: true,
-                onChanged: _search,
-                decoration: const InputDecoration(
-                  hintText: 'Search for a place...',
-                  prefixIcon: Icon(Icons.search),
-                ),
-              ),
-            ),
-            if (_isLoading) const LinearProgressIndicator(),
-            Expanded(
-              child: ListView.builder(
-                controller: scrollController,
-                itemCount: _results.length,
-                itemBuilder: (context, index) {
-                  final result = _results[index];
-                  return ListTile(
-                    leading: const Icon(Icons.location_on_outlined),
-                    title: Text(result.mainText),
-                    subtitle: Text(
-                      result.secondaryText,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    onTap: () {
-                      Navigator.of(context).pop(result.toPlaceDetails());
-                    },
-                  );
-                },
-              ),
-            ),
-          ],
-        );
-      },
     );
   }
 }

@@ -21,6 +21,14 @@ final driverRidesProvider = StreamProvider<List<RideModel>>((ref) {
   return firestoreService.getDriverRides(user.uid);
 });
 
+// Passenger's rides stream
+final passengerRidesProvider = StreamProvider<List<RideModel>>((ref) {
+  final user = ref.watch(currentUserProvider).valueOrNull;
+  if (user == null) return Stream.value([]);
+  final firestoreService = ref.watch(firestoreServiceProvider);
+  return firestoreService.getPassengerRides(user.uid);
+});
+
 // Single ride stream
 final rideStreamProvider =
     StreamProvider.family<RideModel?, String>((ref, rideId) {
@@ -49,7 +57,15 @@ class MatchingRidesNotifier
   }) async {
     state = const AsyncValue.loading();
     try {
-      final rides = _ref.read(activeRidesProvider).valueOrNull ?? [];
+      // First ensure active rides are loaded
+      List<RideModel> rides = _ref.read(activeRidesProvider).valueOrNull ?? [];
+
+      // If rides are empty, wait for the stream to emit
+      if (rides.isEmpty) {
+        final firestoreService = _ref.read(firestoreServiceProvider);
+        rides = await firestoreService.getActiveRides().first;
+      }
+
       final matchingService = _ref.read(rideMatchingServiceProvider);
 
       final results = matchingService.findMatchingRides(

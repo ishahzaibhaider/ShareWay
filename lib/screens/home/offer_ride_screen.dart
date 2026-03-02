@@ -8,6 +8,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/rides_provider.dart';
 import '../../services/maps/osm_service.dart';
 import '../../widgets/common/custom_button.dart';
+import '../../widgets/common/map_location_picker.dart';
 import '../home/find_ride_screen.dart';
 
 class OfferRideScreen extends ConsumerStatefulWidget {
@@ -41,26 +42,26 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
     super.dispose();
   }
 
-  Future<void> _showPlacePicker(bool isOrigin) async {
+  Future<void> _showLocationPicker(bool isOrigin) async {
     final osmService = ref.read(osmServiceProvider);
-    final controller = isOrigin ? _originController : _destinationController;
 
-    final result = await showModalBottomSheet<PlaceDetails>(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    final result = await Navigator.of(context).push<PlaceDetails>(
+      MaterialPageRoute(
+        builder: (context) => MapLocationPicker(
+          osmService: osmService,
+          title: isOrigin ? 'Select Origin' : 'Select Destination',
+        ),
       ),
-      builder: (context) => PlaceSearchSheet(osmService: osmService),
     );
 
     if (result != null) {
       setState(() {
-        controller.text = result.address;
         if (isOrigin) {
           _originPlace = result;
+          _originController.text = result.address.split(',').take(2).join(', ');
         } else {
           _destinationPlace = result;
+          _destinationController.text = result.address.split(',').take(2).join(', ');
         }
       });
     }
@@ -93,7 +94,12 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
     }
 
     final user = ref.read(currentUserProvider).valueOrNull;
-    if (user == null) return;
+    if (user == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please log in first')),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -101,12 +107,22 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
       final osmService = ref.read(osmServiceProvider);
 
       // Get directions for route info via OSRM
-      final directions = await osmService.getDirections(
-        originLat: _originPlace!.lat,
-        originLng: _originPlace!.lng,
-        destLat: _destinationPlace!.lat,
-        destLng: _destinationPlace!.lng,
-      );
+      double distanceKm = 0.0;
+      try {
+        final directions = await osmService.getDirections(
+          originLat: _originPlace!.lat,
+          originLng: _originPlace!.lng,
+          destLat: _destinationPlace!.lat,
+          destLng: _destinationPlace!.lng,
+        );
+        if (directions != null) {
+          distanceKm = directions.distanceMeters / 1000;
+        }
+      } catch (_) {
+        // Continue without distance if OSRM fails
+      }
+
+      final fare = distanceKm * AppConstants.defaultFarePerKm;
 
       final departureDateTime = DateTime(
         _departureDate.year,
@@ -115,11 +131,6 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
         _departureTime.hour,
         _departureTime.minute,
       );
-
-      final distanceKm = directions != null
-          ? directions.distanceMeters / 1000
-          : 0.0;
-      final fare = distanceKm * AppConstants.defaultFarePerKm;
 
       final ride = RideModel(
         id: '',
@@ -171,7 +182,7 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('Error creating ride: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -194,12 +205,13 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
             TextField(
               controller: _originController,
               readOnly: true,
-              onTap: () => _showPlacePicker(true),
+              onTap: () => _showLocationPicker(true),
               decoration: InputDecoration(
                 labelText: 'From',
-                hintText: 'Select origin',
+                hintText: 'Tap to select origin on map',
                 prefixIcon: Icon(Icons.circle_outlined,
                     color: AppTheme.primaryColor, size: 18),
+                suffixIcon: const Icon(Icons.map_outlined, size: 18),
               ),
             ),
             const SizedBox(height: 12),
@@ -208,12 +220,13 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
             TextField(
               controller: _destinationController,
               readOnly: true,
-              onTap: () => _showPlacePicker(false),
+              onTap: () => _showLocationPicker(false),
               decoration: InputDecoration(
                 labelText: 'To',
-                hintText: 'Select destination',
+                hintText: 'Tap to select destination on map',
                 prefixIcon: Icon(Icons.location_on,
                     color: AppTheme.accentColor, size: 18),
+                suffixIcon: const Icon(Icons.map_outlined, size: 18),
               ),
             ),
             const SizedBox(height: 20),
@@ -257,7 +270,7 @@ class _OfferRideScreenState extends ConsumerState<OfferRideScreen> {
                       decoration: BoxDecoration(
                         color: _availableSeats == seats
                             ? AppTheme.primaryColor
-                            : Colors.grey.shade100,
+                            : Colors.white.withOpacity(0.08),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Column(

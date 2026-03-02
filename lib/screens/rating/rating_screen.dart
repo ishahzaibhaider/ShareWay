@@ -7,6 +7,7 @@ import '../../models/rating_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/rides_provider.dart';
 import '../../widgets/common/custom_button.dart';
+import '../../widgets/common/gradient_scaffold.dart';
 import '../../widgets/common/loading_indicator.dart';
 
 class RatingScreen extends ConsumerStatefulWidget {
@@ -76,7 +77,7 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
     final rideAsync = ref.watch(rideStreamProvider(widget.rideId));
     final currentUser = ref.watch(currentUserProvider).valueOrNull;
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(title: const Text('Rate Your Ride')),
       body: rideAsync.when(
         loading: () => const LoadingIndicator(),
@@ -102,9 +103,13 @@ class _RatingScreenState extends ConsumerState<RatingScreen> {
                 const Icon(Icons.check_circle,
                     size: 80, color: AppTheme.primaryColor),
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Ride Completed!',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: AppTheme.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(

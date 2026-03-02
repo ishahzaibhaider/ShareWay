@@ -45,7 +45,7 @@ class ChatListScreen extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.chat_bubble_outline,
-                            size: 64, color: Colors.grey.shade300),
+                            size: 64, color: Colors.white.withOpacity(0.3)),
                         const SizedBox(height: 16),
                         const Text('No conversations yet'),
                         const SizedBox(height: 8),
@@ -118,7 +118,7 @@ class ChatListScreen extends ConsumerWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Icon(Icons.inbox_outlined,
-                            size: 64, color: Colors.grey.shade300),
+                            size: 64, color: Colors.white.withOpacity(0.3)),
                         const SizedBox(height: 16),
                         const Text('No pending requests'),
                       ],

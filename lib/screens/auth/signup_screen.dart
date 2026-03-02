@@ -5,6 +5,7 @@ import '../../config/theme.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/custom_text_field.dart';
 import '../../widgets/common/custom_button.dart';
+import '../../widgets/common/gradient_scaffold.dart';
 
 class SignupScreen extends ConsumerStatefulWidget {
   const SignupScreen({super.key});
@@ -60,7 +61,7 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
     final authState = ref.watch(currentUserProvider);
     final isLoading = authState is AsyncLoading;
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),

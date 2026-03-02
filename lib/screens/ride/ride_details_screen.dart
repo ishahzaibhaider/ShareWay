@@ -11,6 +11,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/rides_provider.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../widgets/common/loading_indicator.dart';
+import '../../widgets/common/gradient_scaffold.dart';
 
 class RideDetailsScreen extends ConsumerStatefulWidget {
   final String rideId;
@@ -68,7 +69,7 @@ class _RideDetailsScreenState extends ConsumerState<RideDetailsScreen> {
     final rideAsync = ref.watch(rideStreamProvider(widget.rideId));
     final currentUser = ref.watch(currentUserProvider).valueOrNull;
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         title: const Text('Ride Details'),
         leading: IconButton(
@@ -177,14 +178,14 @@ class _RideDetailsScreenState extends ConsumerState<RideDetailsScreen> {
                                   ],
                                 ),
                               ),
-                              if (!isDriver)
+                              if (!isDriver && currentUser != null)
                                 IconButton(
                                   onPressed: () async {
                                     final firestoreService =
                                         ref.read(firestoreServiceProvider);
                                     final chatId = await firestoreService
                                         .getOrCreateChatRoom(
-                                      userId1: currentUser!.uid,
+                                      userId1: currentUser.uid,
                                       userId2: ride.driverId,
                                       rideId: ride.id,
                                     );

@@ -6,6 +6,7 @@ import '../../models/message_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/messages_provider.dart';
 import '../../providers/rides_provider.dart';
+import '../../widgets/common/gradient_scaffold.dart';
 
 class ChatScreen extends ConsumerStatefulWidget {
   final String chatRoomId;
@@ -19,12 +20,25 @@ class ChatScreen extends ConsumerStatefulWidget {
 class _ChatScreenState extends ConsumerState<ChatScreen> {
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
+  int _previousMessageCount = 0;
 
   @override
   void dispose() {
     _messageController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_scrollController.hasClients) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        );
+      }
+    });
   }
 
   Future<void> _sendMessage() async {
@@ -55,7 +69,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
     final messages = ref.watch(messagesProvider(widget.chatRoomId));
     final currentUser = ref.watch(currentUserProvider).valueOrNull;
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         title: const Text('Chat'),
         leading: IconButton(
@@ -81,6 +95,12 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                   );
                 }
 
+                // Auto-scroll when new messages arrive
+                if (msgs.length != _previousMessageCount) {
+                  _previousMessageCount = msgs.length;
+                  _scrollToBottom();
+                }
+
                 return ListView.builder(
                   controller: _scrollController,
                   padding: const EdgeInsets.all(16),
@@ -103,7 +123,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                         decoration: BoxDecoration(
                           color: isMe
                               ? AppTheme.primaryColor
-                              : Colors.grey.shade200,
+                              : Colors.white.withOpacity(0.12),
                           borderRadius: BorderRadius.only(
                             topLeft: const Radius.circular(16),
                             topRight: const Radius.circular(16),
@@ -112,6 +132,9 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                             bottomRight:
                                 Radius.circular(isMe ? 4 : 16),
                           ),
+                          border: isMe
+                              ? null
+                              : Border.all(color: Colors.white.withOpacity(0.2)),
                         ),
                         child: Column(
                           crossAxisAlignment: isMe
@@ -124,7 +147,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w600,
-                                  color: AppTheme.textSecondary,
+                                  color: AppTheme.primaryColor,
                                 ),
                               ),
                             Text(
@@ -157,14 +180,10 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 4,
-                  offset: const Offset(0, -2),
-                ),
-              ],
+              color: Colors.white.withOpacity(0.1),
+              border: Border(
+                top: BorderSide(color: Colors.white.withOpacity(0.2)),
+              ),
             ),
             child: SafeArea(
               child: Row(
@@ -181,7 +200,7 @@ class _ChatScreenState extends ConsumerState<ChatScreen> {
                           borderSide: BorderSide.none,
                         ),
                         filled: true,
-                        fillColor: Colors.grey.shade100,
+                        fillColor: Colors.white.withOpacity(0.08),
                         contentPadding: const EdgeInsets.symmetric(
                             horizontal: 16, vertical: 10),
                       ),

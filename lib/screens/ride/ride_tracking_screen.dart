@@ -7,6 +7,7 @@ import '../../providers/auth_provider.dart';
 import '../../providers/rides_provider.dart';
 import '../../widgets/common/custom_button.dart';
 import '../../widgets/common/loading_indicator.dart';
+import '../../widgets/common/gradient_scaffold.dart';
 
 class RideTrackingScreen extends ConsumerStatefulWidget {
   final String rideId;
@@ -63,7 +64,7 @@ class _RideTrackingScreenState extends ConsumerState<RideTrackingScreen> {
     final rideAsync = ref.watch(rideStreamProvider(widget.rideId));
     final currentUser = ref.watch(currentUserProvider).valueOrNull;
 
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         title: const Text('Ride Tracking'),
         leading: IconButton(
@@ -139,11 +140,11 @@ class _RideTrackingScreenState extends ConsumerState<RideTrackingScreen> {
                             ),
                           ],
                         ),
-                        const Padding(
-                          padding: EdgeInsets.only(left: 6),
+                        Padding(
+                          padding: const EdgeInsets.only(left: 6),
                           child: Align(
                             alignment: Alignment.centerLeft,
-                            child: Icon(Icons.more_vert, size: 18, color: Colors.grey),
+                            child: Icon(Icons.more_vert, size: 18, color: Colors.white.withOpacity(0.3)),
                           ),
                         ),
                         Row(

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../config/theme.dart';
 import '../../models/user_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../widgets/common/custom_text_field.dart';
 import '../../widgets/common/custom_button.dart';
+import '../../widgets/common/gradient_scaffold.dart';
 
 class VehicleDetailsScreen extends ConsumerStatefulWidget {
   const VehicleDetailsScreen({super.key});
@@ -89,7 +91,7 @@ class _VehicleDetailsScreenState extends ConsumerState<VehicleDetailsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
+    return GradientScaffold(
       appBar: AppBar(
         title: const Text('Vehicle Details'),
         leading: IconButton(
@@ -133,7 +135,9 @@ class _VehicleDetailsScreenState extends ConsumerState<VehicleDetailsScreen> {
               ),
               const SizedBox(height: 20),
               Text('Available Seats',
-                  style: TextStyle(fontWeight: FontWeight.w600)),
+                  style: TextStyle(
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textPrimary)),
               const SizedBox(height: 8),
               Row(
                 children: List.generate(4, (index) {
@@ -147,7 +151,7 @@ class _VehicleDetailsScreenState extends ConsumerState<VehicleDetailsScreen> {
                         decoration: BoxDecoration(
                           color: _seats == seats
                               ? Theme.of(context).primaryColor
-                              : Colors.grey.shade100,
+                              : Colors.white.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         child: Center(
@@ -156,8 +160,9 @@ class _VehicleDetailsScreenState extends ConsumerState<VehicleDetailsScreen> {
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 18,
-                              color:
-                                  _seats == seats ? Colors.white : Colors.black,
+                              color: _seats == seats
+                                  ? Colors.white
+                                  : Colors.white.withOpacity(0.7),
                             ),
                           ),
                         ),

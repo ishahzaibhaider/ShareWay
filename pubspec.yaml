@@ -1,0 +1,62 @@
+name: shareway
+description: AI-Powered Ride-Sharing Mobile Application for Urban Commuters
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # UI & Fonts
+  google_fonts: ^6.2.1
+  cupertino_icons: ^1.0.6
+
+  # Firebase
+  firebase_core: ^2.27.0
+  firebase_auth: ^4.17.9
+  cloud_firestore: ^4.15.9
+  firebase_storage: ^11.7.4
+  firebase_messaging: ^14.7.19
+
+  # Maps & Location
+  google_maps_flutter: ^2.6.0
+  geolocator: ^11.0.0
+  geocoding: ^3.0.0
+
+  # State Management
+  provider: ^6.1.2
+
+  # Networking
+  http: ^1.2.1
+  dio: ^5.4.3+1
+
+  # Local Storage
+  shared_preferences: ^2.2.3
+  flutter_secure_storage: ^9.0.0
+
+  # UI Helpers
+  flutter_svg: ^2.0.10+1
+  cached_network_image: ^3.3.1
+  image_picker: ^1.1.1
+  permission_handler: ^11.3.1
+  url_launcher: ^6.2.6
+  intl: ^0.20.2
+  shimmer: ^3.0.0
+  lottie: ^3.1.0
+
+  # Payments
+  flutter_stripe: ^10.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.2
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - assets/icons/

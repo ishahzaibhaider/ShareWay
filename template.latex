@@ -1,0 +1,245 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{}
+
+\begin{document}
+
+\includegraphics[width=1.0625in,height=1.0625in]{vertopal_a22e7e1890714919ab04d7a89341442c/media/image1.jpeg}\textbf{COMSATS
+University Islamabad}
+
+\textbf{Department of Computer Science}
+
+\textbf{CSC291 Software Engineering}
+
+\textbf{Semester: Spring 2026}
+
+\textbf{BS(AI) -- Section 6}
+
+\textbf{Assignment No.1}
+
+\textbf{Group No 14}
+
+\textbf{Title of the Project}
+
+\emph{LeafLogic}
+
+\textbf{Submitted by:}
+
+\emph{Aymen Ali Seemab}
+
+\emph{FA23-BAI-011}
+
+\emph{Khair ul wara Hussain}
+
+\emph{FA23-BAI-022}
+
+\emph{Nimra Tahseen Yousaf}
+
+\emph{FA23-BAI-043}
+
+\textbf{Submission Date:}
+
+10 -- March -- 2026
+
+\textbf{Project Title:} \emph{LeafLogic} (AI-Powered Plant Disease
+Diagnostic System)
+
+\textbf{1. Project Overview}
+
+\textbf{Scope}
+
+LeafLogic is a cross-platform mobile application (Android/iOS) designed
+to bridge the gap between complex botanical science and everyday
+gardening. The system leverages Flutter for the frontend and a
+Python-based Machine Learning backend to provide instantaneous, on-site
+disease diagnosis through image recognition. It is specifically scoped
+to identify at least 15 distinct plant-disease pairs across five major
+species, providing both a diagnosis and an organic treatment plan.
+
+\textbf{Problem Statement}
+
+In both domestic and large-scale agriculture, rapid identification of
+plant pathology is critical for crop survival. Traditional diagnostic
+methods, such as consulting physical encyclopedias or waiting for human
+experts, are often too slow to prevent the rapid spread of pathogens.
+There is a need for a high-speed, accessible tool that reduces
+"time-to-treatment" for distressed plants.
+
+\textbf{Objectives}
+
+\begin{itemize}
+\item
+  \textbf{Develop an Accessible Diagnostic Tool:} To create a
+  functional, cross-platform mobile MVP (using Flutter) that allows
+  users to easily photograph a distressed leaf and receive an
+  instantaneous disease diagnosis.
+\item
+  \textbf{High Accuracy Identification:} Achieve 80\%+ accuracy in
+  detecting common diseases like Rust, Powdery Mildew, and Blight.
+\item
+  \textbf{Educational Outreach:} Provide actionable, environmentally
+  friendly treatment advice alongside the diagnosis.
+\item
+  \textbf{History Tracking:} Enable users to monitor plant health over
+  time through a persistent digital log.
+\item
+  \textbf{Offline Functionality:} Ensure basic diagnostic capabilities
+  in remote areas with poor cellular reception.
+\end{itemize}
+
+\textbf{System Limitations / Constraints}
+
+\begin{itemize}
+\item
+  \textbf{Species Limitation:} The initial MVP is constrained to five
+  major plant species and 15 specific plant-disease pairs.
+\item
+  \textbf{Hardware Dependency:} Optimal performance requires a mobile
+  device with a functional camera and enough processing power to run
+  TFLite models.
+\item
+  \textbf{Not a Substitute for Lab Testing:} The app provides a
+  preliminary diagnostic suggestion based on visual symptoms. It is not
+  a substitute for professional laboratory testing and should be used as
+  a guide, not a definitive, legally-binding diagnosis.
+\item
+  \textbf{Liability:} The project explicitly avoids "life-safety"
+  liability by focusing on plant pathology rather than edibility.
+\item
+  \textbf{Storage:} High-resolution reference images and the full
+  "Disease Encyclopedia" require an internet connection to access the
+  cloud database.
+\end{itemize}
+
+\textbf{2. System Requirements}
+
+\textbf{Functional Requirements (FR)}
+
+\begin{itemize}
+\item
+  \textbf{Image Capture:} The system must allow users to photograph a
+  distressed leaf using an integrated camera module with an overlay
+  guide.
+\item
+  \textbf{Positioning Assistance:} The system must display an on-screen
+  guide or overlay within the camera module to assist the user in
+  positioning the leaf correctly for optimal scanning.
+\item
+  \textbf{Image Pre-processing:} The system must pre-process the
+  captured or selected image using OpenCV for noise reduction and
+  segmentation before sending it to the ML model.
+\item
+  \textbf{AI Disease Analysis:} The system must utilize a trained CNN
+  model (such as MobileNetV2 or ResNet-50) to analyze the image and
+  identify the plant species and specific disease.
+\item
+  \textbf{Diagnostic Reporting:} The system must return and display a
+  diagnosis result, including the identified disease name, the plant
+  species, and a confidence score (e.g., 94\% Certainty).
+\item
+  \textbf{Treatment Recommendations:} The system must query its
+  repository to display relevant, actionable treatment plans, including
+  both organic and chemical options, based on the diagnosed disease.
+\item
+  \textbf{Automated Data Logging:} The system must automatically save
+  every scan result, including the image, diagnosis, and date, to the
+  user\textquotesingle s persistent history log.
+\item
+  \textbf{History Management:} The system must allow users to view,
+  browse, and delete past scans from their localized or cloud-based
+  history log to track treatment progress.
+\item
+  \textbf{Offline Diagnostics:} The system must function in a limited
+  offline mode by using a locally stored TensorFlow Lite model to
+  provide diagnoses when no internet connection is available.
+\item
+  \textbf{Backend Integration:} The system must communicate with a
+  FastAPI backend to perform high-performance asynchronous diagnostic
+  requests when an internet connection is active.
+\end{itemize}
+
+\textbf{Non-Functional Requirements (NFR)}
+
+\begin{itemize}
+\item
+  \textbf{Performance:} The system should reduce time-to-treatment by
+  80\% compared to manual methods, providing near-instantaneous results.
+\item
+  \textbf{Accuracy:} The diagnostic model must maintain a minimum of
+  80\% accuracy.
+\item
+  \textbf{Usability:} The interface must be clean and "user-friendly"
+  for non-expert gardeners.
+\item
+  \textbf{Portability:} The application must be cross-platform,
+  functional on both Android and iOS devices.
+\item
+  \textbf{Scalability:} The backend (FastAPI) must support
+  high-performance asynchronous requests for future user growth.
+\item
+  \textbf{Efficiency:} The ML model must be optimized (MobileNetV2 or
+  ResNet-50) to have a small footprint suitable for mobile deployment.
+\end{itemize}
+
+\end{document}

@@ -35,16 +35,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           password: _passwordController.text,
         );
 
-    final authState = ref.read(currentUserProvider);
-    if (mounted) {
-      authState.whenOrNull(
-        error: (e, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
-          );
-        },
-      );
-    }
+    if (!mounted) return;
+
+    ref.read(currentUserProvider).whenOrNull(
+      error: (e, _) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      },
+    );
   }
 
   @override

@@ -16,10 +16,11 @@ class ProfileScreen extends ConsumerWidget {
       appBar: AppBar(
         title: const Text('Profile'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () => context.push('/edit-profile'),
-          ),
+          if (userAsync.valueOrNull != null)
+            IconButton(
+              icon: const Icon(Icons.edit),
+              onPressed: () => context.push('/edit-profile'),
+            ),
         ],
       ),
       body: userAsync.when(
@@ -68,7 +69,45 @@ class ProfileScreen extends ConsumerWidget {
         ),
         data: (user) {
           if (user == null) {
-            return const Center(child: Text('Not logged in'));
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(32),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.person_off,
+                        size: 64, color: Colors.white.withOpacity(0.3)),
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Profile not found',
+                      style: TextStyle(
+                          fontSize: 18, fontWeight: FontWeight.bold),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Your account exists but has no profile data. '
+                      'Please sign out and sign up again.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: AppTheme.textSecondary),
+                    ),
+                    const SizedBox(height: 24),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        await ref
+                            .read(currentUserProvider.notifier)
+                            .signOut();
+                      },
+                      icon: const Icon(Icons.logout, color: Colors.red),
+                      label: const Text('Sign Out',
+                          style: TextStyle(color: Colors.red)),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.red),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
           }
 
           return SingleChildScrollView(

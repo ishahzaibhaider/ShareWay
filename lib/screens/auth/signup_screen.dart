@@ -44,16 +44,15 @@ class _SignupScreenState extends ConsumerState<SignupScreen> {
           phone: _phoneController.text.trim(),
         );
 
-    final authState = ref.read(currentUserProvider);
-    if (mounted) {
-      authState.whenOrNull(
-        error: (e, _) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
-          );
-        },
-      );
-    }
+    if (!mounted) return;
+
+    ref.read(currentUserProvider).whenOrNull(
+      error: (e, _) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+        );
+      },
+    );
   }
 
   @override

@@ -65,7 +65,7 @@ class AppTheme {
         ),
         iconTheme: IconThemeData(color: Colors.white.withOpacity(0.95)),
       ),
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: Colors.white.withOpacity(0.13),
         elevation: 0,
         shape: RoundedRectangleBorder(
@@ -132,7 +132,7 @@ class AppTheme {
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
-      tabBarTheme: TabBarTheme(
+      tabBarTheme: TabBarThemeData(
         labelColor: primaryColor,
         unselectedLabelColor: Colors.white.withOpacity(0.55),
         indicatorColor: primaryColor,
@@ -170,7 +170,7 @@ class AppTheme {
           return Colors.white.withOpacity(0.12);
         }),
       ),
-      dialogTheme: DialogTheme(
+      dialogTheme: DialogThemeData(
         backgroundColor: const Color(0xFF1F3D3D),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
